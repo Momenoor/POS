@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\MenuItemResource\Pages;
+use App\Filament\Resources\MenuItemResource\RelationManagers;
+use App\Models\MenuItem;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class MenuItemResource extends Resource
+{
+    protected static ?string $model = MenuItem::class;
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
+    protected static ?string $navigationGroup = 'Menu Management';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required(),
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(100),
+                Forms\Components\TextInput::make('description')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('price')
+                    ->required()
+                    ->numeric()
+                    ->prefix('AED'),
+                Forms\Components\TextInput::make('cost')
+                    ->numeric()
+                    ->prefix('AED'),
+                Forms\Components\Toggle::make('is_taxable')
+                    ->required(),
+                Forms\Components\Toggle::make('is_available')
+                    ->required(),
+                Forms\Components\FileUpload::make('image')
+                    ->directory('menu-items')
+                    ->image(),
+                Forms\Components\Select::make('tax_rate_id')
+                    ->relationship('taxRate', 'name'),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->circular(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->money('AED')
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_available')
+                    ->boolean(),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //RelationManagers\OrderItemsRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListMenuItems::route('/'),
+            'create' => Pages\CreateMenuItem::route('/create'),
+            'edit' => Pages\EditMenuItem::route('/{record}/edit'),
+        ];
+    }
+}

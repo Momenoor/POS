@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+
+class BankReconciliation extends Model implements AuditableContract
+{
+    use Auditable;
+
+    protected $fillable = [
+        'bank_account_id', 'statement_date', 'statement_balance',
+        'adjusted_balance', 'is_completed', 'notes'
+    ];
+
+    protected $casts = [
+        'is_completed' => 'boolean'
+    ];
+
+    public function bankAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
+
+    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(BankTransaction::class);
+    }
+}
