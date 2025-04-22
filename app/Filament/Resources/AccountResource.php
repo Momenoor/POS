@@ -23,34 +23,7 @@ class AccountResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(20)
-                    ->unique(ignoreRecord: true),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'asset' => 'Asset',
-                        'liability' => 'Liability',
-                        'equity' => 'Equity',
-                        'revenue' => 'Revenue',
-                        'expense' => 'Expense',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('parent_account_id')
-                    ->relationship('parent', 'name')
-                    ->searchable(['code', 'name', 'type'])
-                    ->preload(),
-                Forms\Components\Toggle::make('is_system_account'),
-                Forms\Components\TextInput::make('opening_balance')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-            ]);
+            ->schema(self::getFormSchema());
     }
 
     public static function table(Table $table): Table
@@ -149,5 +122,40 @@ class AccountResource extends Resource
             ->withSum('journalItems as total_debit', 'debit')
             ->withSum('journalItems as total_credit', 'credit')
             ->with(['parent', 'parent.parent']);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getFormSchema(): array
+    {
+        return [
+            Forms\Components\TextInput::make('code')
+                ->required()
+                ->maxLength(20)
+                ->unique(ignoreRecord: true),
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(100),
+            Forms\Components\Select::make('type')
+                ->options([
+                    'asset' => 'Asset',
+                    'liability' => 'Liability',
+                    'equity' => 'Equity',
+                    'revenue' => 'Revenue',
+                    'expense' => 'Expense',
+                ])
+                ->required(),
+            Forms\Components\Select::make('parent_account_id')
+                ->relationship('parent', 'name')
+                ->searchable(['code', 'name', 'type'])
+                ->preload(),
+            Forms\Components\Toggle::make('is_system_account'),
+            Forms\Components\TextInput::make('opening_balance')
+                ->numeric()
+                ->default(0),
+            Forms\Components\Textarea::make('description')
+                ->columnSpanFull(),
+        ];
     }
 }
