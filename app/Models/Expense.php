@@ -2,22 +2,29 @@
 
 namespace App\Models;
 
+use App\Observers\ExpenseObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
+#[ObservedBy([ExpenseObserver::class])]
 class Expense extends Model implements AuditableContract
 {
     use Auditable, SoftDeletes;
 
     protected $fillable = [
-        'account_id', 'supplier_id', 'user_id', 'amount', 'date',
-        'description', 'is_paid', 'payment_method', 'reference'
+        'account_id', 'inventory_item_id', 'bill_id', 'date', 'due_date', 'notes',
+        'quantity', 'unit_cost', 'subtotal', 'payment_id'
     ];
 
     protected $casts = [
-        'is_paid' => 'boolean'
+        'date' => 'date',
+        'due_date' => 'date',
+        'unit_cost' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
     public function account(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -25,28 +32,23 @@ class Expense extends Model implements AuditableContract
         return $this->belongsTo(Account::class);
     }
 
-    public function supplier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function inventoryItem(): BelongsTo
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(InventoryItem::class);
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function bill(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Bill::class);
     }
 
-    public function payments(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function payment(): BelongsTo
     {
-        return $this->morphMany(Payment::class, 'payable');
+        return $this->belongsTo(Payment::class);
     }
 
-    public function scopePaid($query)
+    public function journalItem(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $query->where('is_paid', true);
-    }
-
-    public function scopeUnpaid($query)
-    {
-        return $query->where('is_paid', false);
+        return $this->morphOne(JournalItem::class, 'referenceable');
     }
 }

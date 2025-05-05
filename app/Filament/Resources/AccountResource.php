@@ -70,9 +70,12 @@ class AccountResource extends Resource
             ->pushHeaderActions([
                 Tables\Actions\ExportAction::make()
                     ->exporter(AccountExporter::class),
-                Tables\Actions\Action::make('setup')
-                    ->label('Accounts Setup')
-                    ->url(route('filament.admin.resources.accounts.setup'))
+                Tables\Actions\Action::make('Opening Balance Setup')
+                    ->color(Color::Green)
+                    ->url(route('filament.admin.pages.opening-balance-setup')),
+                Tables\Actions\Action::make('Account Setup')
+                    ->color(Color::Purple)
+                    ->url(route('filament.admin.pages.accounts-setup')),
             ])
             ->paginated(false)
             ->defaultSort('code')
@@ -100,7 +103,7 @@ class AccountResource extends Resource
     {
         return [
             //RelationManagers\ChildrenRelationManager::class,
-            //RelationManagers\JournalItemsRelationManager::class,
+            //RelationManagers\JournalEntryItemsRelationManager::class,
             //RelationManagers\ExpensesRelationManager::class,
             //RelationManagers\BankAccountRelationManager::class,
         ];
@@ -112,7 +115,6 @@ class AccountResource extends Resource
             'index' => Pages\ListAccounts::route('/'),
             'create' => Pages\CreateAccount::route('/create'),
             'edit' => Pages\EditAccount::route('/{record}/edit'),
-            'setup' => Pages\AccountsSetup::route('/setup'),
         ];
     }
 
@@ -149,6 +151,7 @@ class AccountResource extends Resource
             Forms\Components\Select::make('parent_account_id')
                 ->relationship('parent', 'name')
                 ->searchable(['code', 'name', 'type'])
+                ->getOptionLabelFromRecordUsing(fn($record) => '[' . $record->code . '] - ' . $record->name)
                 ->preload(),
             Forms\Components\Toggle::make('is_system_account'),
             Forms\Components\TextInput::make('opening_balance')

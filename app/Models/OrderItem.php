@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use OwenIt\Auditing\Auditable;
 
 class OrderItem extends Model
 {
-    use HasFactory, LogsActivity;
+    use Auditable;
 
     protected $fillable = [
         'order_id',
@@ -17,18 +15,21 @@ class OrderItem extends Model
         'quantity',
         'unit_price',
         'special_instructions',
-        'selected_options'
+        'selected_options',
+        'subtotal',
     ];
 
     protected $casts = [
-        'selected_options' => 'array'
+        'selected_options' => 'array',
+        'unit_price' => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
-    public function getActivitylogOptions(): LogOptions
+    protected static function booted()
     {
-        return LogOptions::defaults()
-            ->logOnly(['quantity', 'unit_price'])
-            ->logOnlyDirty();
+        static::saving(function ($item) {
+            $item->subtotal = $item->unit_price * $item->quantity;
+        });
     }
 
     public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo

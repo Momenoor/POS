@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Account extends Model implements AuditableContract
 {
-    use HasFactory, Auditable, LogsActivity;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'code',
@@ -25,15 +24,9 @@ class Account extends Model implements AuditableContract
     ];
 
     protected $casts = [
-        'is_system_account' => 'boolean'
+        'is_system_account' => 'boolean',
+        'opening_balance' => 'decimal:2',
     ];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['code', 'name', 'type'])
-            ->logOnlyDirty();
-    }
 
     public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -58,17 +51,6 @@ class Account extends Model implements AuditableContract
     public function bankAccount(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(BankAccount::class);
-    }
-
-    public function currentBalance(): Attribute
-    {
-        return Attribute::get(function () {
-            $debit = $this->total_debit;
-            $credit = $this->total_credit;
-            return in_array($this->type, ['asset', 'expense'])
-                ? $debit - $credit
-                : $credit - $debit;
-        });
     }
 
     public function depth(): Attribute
@@ -109,6 +91,88 @@ class Account extends Model implements AuditableContract
     public function scopeRevenue($query)
     {
         return $query->where('type', 'revenue');
+    }
+
+    public function scopeLeafs($query)
+    {
+        return $query->whereNotExists(function ($subquery) {
+            $subquery->select(DB::raw(1))
+                ->from('accounts as child')
+                ->whereColumn('child.parent_id', 'accounts.id');
+        });
+    }
+
+    public function scopeParents($query)
+    {
+        return $query->whereExists(function ($subquery) {
+            $subquery->select(DB::raw(1))
+                ->from('accounts as child')
+                ->whereColumn('child.parent_id', 'accounts.id');
+        });
+    }
+    public function scopeRoot($query)
+    {
+        return $query->whereNull('parent_account_id');
+    }
+
+    public function isLeaf(): bool
+    {
+        return $this->children()->count() === 0;
+    }
+
+    public function formattedLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => '[' . $this->code . '] - ' . $this->name,
+        );
+    }
+
+    public function getAllParents()
+    {
+        $parents = collect();
+        $currentParent = $this->parent;
+
+        while ($currentParent !== null) {
+            $parents->push($currentParent);
+            $currentParent = $currentParent->parent;
+        }
+
+        return $parents;
+    }
+
+    public function updateParentBalances(float $amountChange): void
+    {
+        // Early return if there's no change or this isn't a leaf account
+        if ($amountChange == 0) {
+            return;
+        }
+
+        // Get all parent accounts in hierarchy
+        $parents = $this->getAllParents();
+
+        // Update each parent's current_balance
+        foreach ($parents as $parent) {
+            // Use DB::raw to ensure atomicity when updating
+            $parent->increment('current_balance', $amountChange);
+        }
+    }
+
+    public static function recalculateAllParentBalances(): void
+    {
+        // First, reset all parent account balances to opening_balance
+        self::parents()->update([
+            'current_balance' => DB::raw('opening_balance')
+        ]);
+
+        // Group all leaf account balances by parent_id
+        $leafAccounts = self::leafs()->get();
+
+        // Process each leaf account
+        foreach ($leafAccounts as $leafAccount) {
+            if ($leafAccount->parent_id) {
+                $leafAccount->updateParentBalances($leafAccount->current_balance - $leafAccount->opening_balance);
+            }
+        }
     }
 
 }

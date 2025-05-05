@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ *
+ */
 class MenuItem extends Model implements AuditableContract
 {
-    use HasFactory, SoftDeletes, Auditable, LogsActivity;
+    use HasFactory, SoftDeletes, Auditable;
 
     protected $fillable = [
         'category_id',
@@ -32,14 +35,9 @@ class MenuItem extends Model implements AuditableContract
         'options' => 'array',
         'is_taxable' => 'boolean',
         'is_available' => 'boolean',
+        'price' => 'decimal:2',
+        'cost' => 'decimal:2',
     ];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'price', 'is_available', 'cost', 'tax_rate_id'])
-            ->logOnlyDirty();
-    }
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -54,5 +52,10 @@ class MenuItem extends Model implements AuditableContract
     public function taxRate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(TaxRate::class);
+    }
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
@@ -34,5 +35,12 @@ class InventoryTransaction extends Model implements AuditableContract
     public function referenceable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function totalCost(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => (float)$this->quantity * (float)$this->unit_cost,
+        );
     }
 }

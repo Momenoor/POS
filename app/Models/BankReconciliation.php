@@ -16,7 +16,10 @@ class BankReconciliation extends Model implements AuditableContract
     ];
 
     protected $casts = [
-        'is_completed' => 'boolean'
+        'statement_date' => 'date',
+        'statement_balance' => 'decimal:2',
+        'adjusted_balance' => 'decimal:2',
+        'is_completed' => 'boolean',
     ];
 
     public function bankAccount(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -24,7 +27,7 @@ class BankReconciliation extends Model implements AuditableContract
         return $this->belongsTo(BankAccount::class);
     }
 
-    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function bankTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(BankTransaction::class);
     }

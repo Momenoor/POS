@@ -6,29 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Staff extends Model implements AuditableContract
 {
-    use HasFactory, Auditable, LogsActivity;
+    use HasFactory, Auditable;
 
     protected $fillable = [
-        'user_id',
-        'restaurant_id',
-        'position',
-        'hourly_rate',
-        'hire_date',
-        'termination_date',
-        'notes'
+        'user_id', 'restaurant_id', 'position', 'salary', 'passport_number',
+        'passport_expiry_date', 'emirates_id_number', 'emirates_id_expiry_date',
+        'nationality', 'phone', 'hire_date', 'termination_date', 'notes'
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['position', 'hourly_rate'])
-            ->logOnlyDirty();
-    }
+    protected $casts = [
+        'salary' => 'decimal:2',
+        'hire_date' => 'date',
+        'termination_date' => 'date',
+        'emirates_id_expiry_date' => 'date',
+        'passport_expiry_date' => 'date',
+    ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

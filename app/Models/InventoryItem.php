@@ -11,13 +11,13 @@ class InventoryItem extends Model implements AuditableContract
     use Auditable;
 
     protected $fillable = [
-        'name', 'unit', 'current_quantity', 'alert_quantity', 'supplier_id'
+        'name', 'unit', 'current_quantity', 'alert_quantity'
     ];
 
-    public function supplier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Supplier::class);
-    }
+    protected $casts = [
+        'current_quantity' => 'decimal:3',
+        'alert_quantity' => 'decimal:3',
+    ];
 
     public function inventoryTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Restaurant extends Model implements AuditableContract
 {
-    use HasFactory, Auditable, LogsActivity;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'name',
@@ -37,13 +36,6 @@ class Restaurant extends Model implements AuditableContract
         'business_hours' => 'array',
         'is_active' => 'boolean'
     ];
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'tax_id', 'is_active'])
-            ->logOnlyDirty();
-    }
 
     public function taxRate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

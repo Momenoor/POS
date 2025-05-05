@@ -125,28 +125,34 @@ class RestaurantResource extends Resource
             Forms\Components\Section::make('Settings')
                 ->schema([
                     Forms\Components\TextInput::make('timezone')
-                        ->default('UTC')
+                        ->default('Asia/Dubai')
                         ->maxLength(50),
                     Forms\Components\TextInput::make('currency')
                         ->default('AED')
                         ->maxLength(3),
                     Forms\Components\FileUpload::make('logo_path')
                         ->directory('restaurant-logos')
-                        ->image(),
+                        ->image()
+                        ->imageEditor(),
                     Forms\Components\Toggle::make('is_active')
                         ->required(),
                     TableRepeater::make('business_hours')
-                        ->minItems(1)
+                        ->rules('array')
+                        ->schema([
+                            Forms\Components\Select::make('day')
+                                ->options(Carbon::getDays())
+                                ->required(),
+                            Forms\Components\TimePicker::make('start_time')
+                                ->required()
+                                ->format('H:i'),
+                            Forms\Components\TimePicker::make('end_time')
+                                ->required()
+                                ->format('H:i'),
+                        ])
                         ->headers([
                             Header::make('Day'),
                             Header::make('Start Time'),
                             Header::make('End Time'),
-                        ])
-                        ->schema([
-                            Forms\Components\Select::make('day')
-                                ->options(Carbon::getDays())->required(),
-                            Forms\Components\TimePicker::make('start_time')->required()->default(Carbon::tim)->format('H:i'),
-                            Forms\Components\TimePicker::make('end_time')->required()->format('H:i'),
                         ])
                         ->columnSpanFull(),
                 ])->columns(3),

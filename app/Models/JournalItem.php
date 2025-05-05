@@ -16,6 +16,11 @@ class JournalItem extends Model implements AuditableContract
         'referenceable_type', 'referenceable_id'
     ];
 
+    protected $casts = [
+        'debit' => 'decimal:2',
+        'credit' => 'decimal:2',
+    ];
+
     public function journalEntry(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(JournalEntry::class);

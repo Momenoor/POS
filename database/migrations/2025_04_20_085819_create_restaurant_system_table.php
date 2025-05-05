@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->enum('type', ['asset', 'liability', 'equity', 'revenue', 'expense']);
             $table->foreignId('parent_account_id')->nullable()->constrained('accounts');
             $table->boolean('is_system_account')->default(false);
+            $table->decimal('current_balance', 15, 2)->default(0);
             $table->decimal('opening_balance', 15, 2)->default(0);
             $table->text('description')->nullable();
             $table->timestamps();
@@ -64,18 +65,33 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('restaurant_id')->nullable()->constrained();
             $table->string('position', 50);
-            $table->decimal('hourly_rate', 8, 2)->nullable();
+            $table->decimal('salary', 8, 2)->nullable();
+            $table->string('passport_number', 50)->nullable();
+            $table->string('passport_expiry_date', 50)->nullable();
+            $table->string('emirates_id_number', 50)->nullable();
+            $table->string('emirates_id_expiry_date', 50)->nullable();
+            $table->string('nationality', 50)->nullable();
+            $table->string('phone', 20)->nullable();
             $table->date('hire_date');
             $table->date('termination_date')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            $table->index(['position', 'hire_date']);
+            $table->index(['position', 'hire_date', 'emirates_id_expiry_date']);
+        });
+
+        Schema::create('menus', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
 
         // 2. Restaurant Operations Tables
         Schema::create('menu_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('restaurant_id')->nullable()->constrained();
+            $table->foreignIdFor(\App\Models\Menu::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('name', 100);
             $table->string('description', 255)->nullable();
             $table->integer('sort_order')->default(0);
@@ -122,7 +138,6 @@ return new class extends Migration {
             $table->string('unit', 20);
             $table->decimal('current_quantity', 10, 3)->default(0);
             $table->decimal('alert_quantity', 10, 3)->nullable();
-            $table->foreignId('supplier_id')->nullable()->constrained();
             $table->timestamps();
             $table->index(['name', 'current_quantity']);
         });
@@ -131,12 +146,12 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('inventory_item_id')->nullable()->constrained();
             $table->foreignId('supplier_id')->nullable()->constrained();
-            $table->enum('type', ['purchase', 'consumption', 'adjustment', 'waste']);
+            $table->string('type');
             $table->decimal('quantity', 10, 3);
             $table->decimal('unit_cost', 8, 2)->nullable();
             $table->foreignId('user_id')->constrained();
             $table->text('notes')->nullable();
-            $table->morphs('referenceable');
+            $table->nullableMorphs('referenceable');
             $table->timestamps();
             $table->softDeletes();
             $table->index(['type', 'created_at']);
@@ -166,23 +181,37 @@ return new class extends Migration {
             $table->index(['name', 'phone']);
         });
 
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(\App\Models\Account::class)->nullable()->constrained();
+            $table->foreignIdFor(\App\Models\BankAccount::class)->nullable()->constrained();
+            $table->decimal('amount', 12, 2);
+            $table->date('payment_date')->useCurrent();
+            $table->string('payment_method', 50);
+            $table->string('reference_number', 50)->nullable();
+            $table->foreignId('user_id')->constrained();
+            $table->text('notes')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+            $table->index(['payment_date', 'payment_method']);
+        });
+
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('table_id')->nullable()->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->foreignId('staff_id')->nullable()->constrained('staff');
-            $table->enum('status', ['pending', 'preparing', 'ready', 'served', 'completed', 'cancelled']);
+            $table->string('status')->default('pending');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('tax_amount', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
-            $table->string('payment_method', 50)->nullable();
-            $table->boolean('is_paid')->default(false);
+            $table->foreignIdFor(\App\Models\Payment::class)->nullable()->constrained()->onDelete('cascade');
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->index(['status', 'created_at', 'is_paid']);
+            $table->index(['status', 'created_at']);
         });
 
         Schema::create('order_items', function (Blueprint $table) {
@@ -206,7 +235,7 @@ return new class extends Migration {
             $table->date('entry_date');
             $table->string('reference_number', 50)->unique();
             $table->text('memo')->nullable();
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('user_id')->constrained();
             $table->nullableMorphs('referenceable');
             $table->timestamps();
             $table->softDeletes();
@@ -226,35 +255,34 @@ return new class extends Migration {
             $table->index(['account_id', 'journal_entry_id']);
         });
 
+        Schema::create('bills', function (Blueprint $table) {
+            $table->id();
+            $table->string('reference_number')->unique();
+            $table->text('description')->nullable();
+            $table->date('date');
+            $table->date('due_date');
+            $table->foreignIdFor(\App\Models\Payment::class)->nullable()->constrained()->onDelete('cascade');
+            $table->foreignIdFor(\App\Models\Supplier::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\User::class)->constrained()->onDelete('cascade');;
+            $table->decimal('total', 12, 2);
+            $table->timestamps();
+        });
+
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained();
-            $table->foreignId('supplier_id')->nullable()->constrained();
-            $table->foreignId('user_id')->constrained();
-            $table->decimal('amount', 12, 2);
-            $table->date('date');
-            $table->text('description');
-            $table->boolean('is_paid')->default(true);
-            $table->string('payment_method', 50)->nullable();
-            $table->string('reference', 50)->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-            $table->index(['account_id', 'date', 'is_paid']);
-        });
-
-        Schema::create('payments', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('payable');
-            $table->nullableMorphs('referenceable');
-            $table->decimal('amount', 12, 2);
-            $table->date('payment_date')->useCurrent();
-            $table->string('payment_method', 50);
-            $table->string('reference', 50)->nullable();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignIdFor(\App\Models\Bill::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Payment::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('inventory_item_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->date('date')->nullable();
+            $table->date('due_date')->nullable();
             $table->text('notes')->nullable();
+            $table->integer('quantity')->default(1);
+            $table->decimal('unit_cost', 12, 2)->default(0);
+            $table->decimal('subtotal', 12, 2)->default(0);
             $table->timestamps();
             $table->softDeletes();
-            $table->index(['payment_date', 'payment_method']);
+            $table->index(['account_id', 'date']);
         });
 
         Schema::create('bank_accounts', function (Blueprint $table) {
@@ -264,6 +292,7 @@ return new class extends Migration {
             $table->string('account_number', 50);
             $table->string('routing_number', 50)->nullable();
             $table->decimal('current_balance', 12, 2)->default(0);
+            $table->boolean('is_primary')->default(false);
             $table->timestamps();
             $table->index(['account_number', 'bank_name']);
         });
@@ -282,16 +311,17 @@ return new class extends Migration {
 
         Schema::create('bank_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bank_account_id')->constrained();
+            $table->foreignId('bank_account_id')->nullable()->constrained();
             $table->foreignId('reconciliation_id')->nullable()->constrained('bank_reconciliations');
-            $table->date('transaction_date');
-            $table->string('description', 255);
+            $table->foreignId('user_id')->constrained();
+            $table->foreignIdFor(\App\Models\Account::class)->nullable()->constrained()->onDelete('cascade');
+            $table->date('date');
+            $table->string('description', 255)->nullable();
             $table->decimal('amount', 12, 2);
             $table->string('type');
-            $table->string('reference', 50)->nullable();
-            $table->boolean('is_reconciled')->default(false);
+            $table->string('reference_number', 50)->nullable();
             $table->timestamps();
-            $table->index(['bank_account_id', 'transaction_date', 'type']);
+            $table->index(['bank_account_id', 'date', 'type']);
         });
 
         Schema::create('shifts', function (Blueprint $table) {
@@ -306,7 +336,7 @@ return new class extends Migration {
             $table->index(['staff_id', 'start_time']);
         });
 
-        Schema::create('accounts_setup', function (Blueprint $table) {
+        Schema::create('setups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('type');
@@ -322,7 +352,7 @@ return new class extends Migration {
 
         // Drop tables in reverse order to avoid foreign key conflicts
         $tables = [
-            'accounts_setup',
+            'accounts_setups',
             'shifts',
             'tax_rates',
             'bank_transactions',
@@ -330,6 +360,7 @@ return new class extends Migration {
             'bank_accounts',
             'payments',
             'expenses',
+            'bills',
             'journal_items',
             'journal_entries',
             'accounts',

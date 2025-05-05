@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use PhpParser\Builder;
 
 class BankAccountResource extends Resource
 {
@@ -36,6 +37,10 @@ class BankAccountResource extends Resource
                 Tables\Columns\TextColumn::make('current_balance')
                     ->money('AED')
                     ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_primary')
+                    ->beforeStateUpdated(function ($record) {
+                        BankAccount::query()->update(['is_primary' => false]);
+                    })
             ])
             ->filters([
                 //

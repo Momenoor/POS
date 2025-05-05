@@ -2,44 +2,55 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Order extends Model implements AuditableContract
 {
-    use HasFactory, Auditable, LogsActivity;
+    use SoftDeletes, Auditable;
 
     protected $fillable = [
-        'restaurant_id',
-        'table_id',
-        'staff_id',
-        'customer_id',
-        'status',
-        'subtotal',
-        'tax_amount',
-        'discount_amount',
-        'total',
-        'payment_method',
-        'is_paid',
-        'notes'
+        'table_id', 'user_id', 'customer_id', 'staff_id', 'status',
+        'subtotal', 'tax_amount', 'discount_amount', 'total',
+        'payment_id', 'notes'
     ];
 
     protected $casts = [
-        'is_paid' => 'boolean',
+        'status' => OrderStatusEnum::class,
+        'subtotal' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
-    public function getActivitylogOptions(): LogOptions
+    protected static function booted()
     {
-        return LogOptions::defaults()
-            ->logOnly(['status', 'total', 'is_paid'])
-            ->logOnlyDirty();
+        static::creating(function ($order) {
+            $order->calculateTotals();
+        });
+
+        static::updating(function ($order) {
+            $order->calculateTotals();
+        });
     }
 
-    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class);
+    }
+    public function calculateTotals(): void
+    {
+        $subtotal = $this->orderItems()->sum('subtotal');
+        $this->subtotal = (float)$subtotal;
+        $this->total = (float)$subtotal + (float)$this->tax_amount - (float)$this->discount_amount;
+    }
+
+    public function orderItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -71,16 +82,16 @@ class Order extends Model implements AuditableContract
 
     public function scopeActive($query)
     {
-        return $query->where('status', '!=', 'cancelled');
+        return $query->whereNotIn('status', OrderStatusEnum::getFailedStatuses());
     }
 
     public function scopeUnpaid($query)
     {
-        return $query->where('is_paid', false);
+        return $query->whereNull('payment_method');
     }
 
     public function scopePaid($query)
     {
-        return $query->where('is_paid', true);
+        return $query->whereNotNull('payment_method');
     }
 }

@@ -10,10 +10,20 @@ class Customer extends Model implements AuditableContract
 {
     use Auditable;
 
-    protected $fillable = ['name', 'email', 'phone', 'address','account_id', 'tax_id'];
+    protected $fillable = ['name', 'email', 'phone', 'address', 'account_id', 'tax_id'];
 
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function account(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    public function taxRate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
     }
 }

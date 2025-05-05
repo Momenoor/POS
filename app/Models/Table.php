@@ -2,30 +2,29 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\TableStatusEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 
 class Table extends Model implements AuditableContract
 {
-    use HasFactory, Auditable, LogsActivity;
+    use  Auditable;
 
     protected $fillable = [
         'restaurant_id',
         'name',
         'capacity',
-        'status'
+        'status',
+        'notes'
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'status'])
-            ->logOnlyDirty();
-    }
+    protected $casts = [
+        'status' => TableStatusEnum::class,
+    ];
 
     public function restaurant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -37,11 +36,13 @@ class Table extends Model implements AuditableContract
         return $this->hasMany(Order::class);
     }
 
-    public function getCurrentOrderAttribute()
+    public function currentOrder(): Attribute
     {
-        return $this->orders()
-            ->whereIn('status', ['pending', 'preparing', 'ready', 'served'])
-            ->latest()
-            ->first();
+        return Attribute::make(
+            get: fn() => $this->orders()
+                ->whereIn('status', OrderStatusEnum::getOperatingStatuses())
+                ->latest()
+                ->first()
+        );
     }
 }
