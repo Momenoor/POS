@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class MenuCategoryItem extends Model
+class MenuCategoryItem extends Pivot
 {
     protected $fillable = [
         'menu_id',
