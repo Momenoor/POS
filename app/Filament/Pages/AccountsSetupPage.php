@@ -39,7 +39,7 @@ class AccountsSetupPage extends Page implements HasForms
     public function mount(): void
     {
         $this->accountsOptions = Account::query()
-            ->leafs()
+            ->whereIsLeaf()
             ->get()
             ->mapWithKeys(fn($account) => [
                 $account->id => "[{$account->code}] - {$account->name}"
