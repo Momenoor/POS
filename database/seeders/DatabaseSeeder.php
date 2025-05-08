@@ -50,9 +50,8 @@ class DatabaseSeeder extends Seeder
         $tables = [
             'accounts', 'tax_rates', 'restaurants', 'staff', 'menu_categories',
             'menu_items', 'suppliers', 'inventory_items', 'inventory_transactions',
-            'tables', 'customers', 'orders', 'order_items', 'journal_entries',
-            'journal_items', 'bills', 'expenses', 'payments', 'bank_accounts',
-            'bank_reconciliations', 'bank_transactions', 'shifts', 'setups'
+            'tables', 'customers', 'orders', 'order_items', 'bank_accounts',
+            'shifts', 'setups'
         ];
 
         $users = [
@@ -424,7 +423,6 @@ class DatabaseSeeder extends Seeder
                 'tax_amount' => 2.50,
                 'discount_amount' => 0.00,
                 'total' => 52.50,
-                'payment_method' => PaymentMethodEnum::CASH,
                 'created_at' => Carbon::now()->subDays(2),
             ],
             [
@@ -449,205 +447,11 @@ class DatabaseSeeder extends Seeder
                 'tax_amount' => 3.75,
                 'discount_amount' => 0.00,
                 'total' => 78.75,
-                'payment_method' => PaymentMethodEnum::CREDIT_CARD,
                 'created_at' => Carbon::now()->subDays(1),
             ],
         ];
 
-        foreach ($orders as $orderData) {
-            Order::create($orderData);
-        }
-
-        // Create order items
-        $orderItems = [
-            // Order 1
-            [
-                'order_id' => 1,
-                'menu_item_id' => 1, // Classic Sandwich
-                'unit_price' => 25.00,
-                'quantity' => 2,
-                'subtotal' => 50.00,
-            ],
-
-            // Order 2
-            [
-                'order_id' => 2,
-                'menu_item_id' => 2, // Chicken Avocado
-                'unit_price' => 30.00,
-                'quantity' => 2,
-                'subtotal' => 60.00,
-            ],
-            [
-                'order_id' => 2,
-                'menu_item_id' => 5, // Fresh Juice
-                'unit_price' => 15.00,
-                'quantity' => 4,
-                'subtotal' => 60.00,
-            ],
-
-            // Order 3
-            [
-                'order_id' => 3,
-                'menu_item_id' => 3, // Veggie Delight
-                'unit_price' => 22.00,
-                'quantity' => 2,
-                'subtotal' => 44.00,
-            ],
-            [
-                'order_id' => 3,
-                'menu_item_id' => 6, // Chocolate Cake
-                'unit_price' => 18.00,
-                'quantity' => 1,
-                'subtotal' => 18.00,
-            ],
-            [
-                'order_id' => 3,
-                'menu_item_id' => 4, // Mineral Water
-                'unit_price' => 5.00,
-                'quantity' => 2,
-                'subtotal' => 10.00,
-            ],
-        ];
-
-        foreach ($orderItems as $itemData) {
-            OrderItem::create($itemData);
-        }
-
-        // Create journal entries for orders
-        foreach ($orders as $order) {
-            if ($order['status'] === OrderStatusEnum::COMPLETED->value || $order['status'] === OrderStatusEnum::DELIVERED->value) {
-                JournalEntry::create([
-                    'entry_date' => $order['created_at'],
-                    'reference_number' => 'ORD-' . $order['id'],
-                    'memo' => 'Order #' . $order['id'],
-                    'user_id' => $order['user_id'],
-                    'referenceable_type' => Order::class,
-                    'referenceable_id' => $order['id'],
-                ]);
-            }
-        }
-
-        // Create bills
-        $bills = [
-            [
-                'reference_number' => 'BILL-001',
-                'description' => 'Monthly food supplies',
-                'date' => Carbon::now()->subDays(10),
-                'due_date' => Carbon::now()->addDays(20),
-                'supplier_id' => 1,
-                'user_id' => 1,
-                'total' => 2500.00,
-            ],
-            [
-                'reference_number' => 'BILL-002',
-                'description' => 'Beverage order',
-                'date' => Carbon::now()->subDays(5),
-                'due_date' => Carbon::now()->addDays(25),
-                'supplier_id' => 2,
-                'user_id' => 1,
-                'total' => 1200.00,
-            ],
-        ];
-
-        foreach ($bills as $billData) {
-            Bill::create($billData);
-        }
-
-        // Create expenses
-        $expenses = [
-            [
-                'account_id' => Account::where('code', '5100')->first()->id, // Food Ingredients
-                'bill_id' => 1,
-                'inventory_item_id' => 1, // Chicken Breast
-                'date' => Carbon::now()->subDays(10),
-                'quantity' => 50,
-                'unit_cost' => 15.00,
-                'total' => 750.00,
-                'notes' => 'Chicken breast purchase',
-            ],
-            [
-                'account_id' => Account::where('code', '5100')->first()->id, // Food Ingredients
-                'bill_id' => 1,
-                'inventory_item_id' => 2, // Avocado
-                'date' => Carbon::now()->subDays(10),
-                'quantity' => 100,
-                'unit_cost' => 3.50,
-                'total' => 350.00,
-                'notes' => 'Avocado purchase',
-            ],
-            [
-                'account_id' => Account::where('code', '5300')->first()->id, // Beverage Costs
-                'bill_id' => 2,
-                'date' => Carbon::now()->subDays(5),
-                'quantity' => 200,
-                'unit_cost' => 1.00,
-                'total' => 200.00,
-                'notes' => 'Water purchase',
-            ],
-            [
-                'account_id' => Account::where('code', '5200')->first()->id, // Bread
-                'bill_id' => 1,
-                'date' => Carbon::now()->subDays(10),
-                'quantity' => 30,
-                'unit_cost' => 2.50,
-                'total' => 75.00,
-                'notes' => 'Bread purchase',
-            ],
-            // Direct expense (not linked to bill)
-            [
-                'account_id' => Account::where('code', '6200')->first()->id, // Rent Expense
-                'date' => Carbon::now()->subDays(1),
-                'quantity' => 1,
-                'unit_cost' => 15000.00,
-                'total' => 15000.00,
-                'notes' => 'Monthly rent payment',
-            ],
-        ];
-
-        foreach ($expenses as $expenseData) {
-            Expense::create($expenseData);
-        }
-
-        // Create payments
-        $payments = [
-            // Order payments
-            [
-                'payable_type' => Order::class,
-                'payable_id' => 1,
-                'amount' => 52.50,
-                'payment_date' => Carbon::now()->subDays(2),
-                'payment_method' => PaymentMethodEnum::CASH,
-                'user_id' => 3,
-                'notes' => 'Full payment for order #1',
-            ],
-            [
-                'payable_type' => Order::class,
-                'payable_id' => 3,
-                'amount' => 78.75,
-                'payment_date' => Carbon::now()->subDays(1),
-                'payment_method' => PaymentMethodEnum::CREDIT_CARD,
-                'user_id' => 1,
-                'notes' => 'Card payment for delivery order',
-            ],
-
-            // Bill payment
-            [
-                'payable_type' => Bill::class,
-                'payable_id' => 1,
-                'amount' => 1175.00,
-                'payment_date' => Carbon::now()->subDays(5),
-                'payment_method' => PaymentMethodEnum::BANK_TRANSFER,
-                'user_id' => 1,
-                'reference' => 'TRANS-12345',
-                'notes' => 'Partial payment for food supplies',
-            ],
-        ];
-
-        foreach ($payments as $paymentData) {
-            Payment::create($paymentData);
-        }
-
-        // Create bank accounts
+               // Create bank accounts
         $bankAccounts = [
             [
                 'account_id' => Account::where('code', '1121')->first()->id,
@@ -667,58 +471,6 @@ class DatabaseSeeder extends Seeder
             BankAccount::create($accountData);
         }
 
-        // Create bank transactions
-        $bankTransactions = [
-            [
-                'bank_account_id' => 1,
-                'account_id' => Account::where('code', '1200')->first()->id, // Accounts Receivable
-                'date' => Carbon::now()->subDays(1),
-                'description' => 'Customer payment',
-                'amount' => 78.75,
-                'type' => BankTransactionTypeEnum::DEPOSIT,
-                'reference' => 'ORD-3',
-                'user_id' => 1,
-            ],
-            [
-                'bank_account_id' => 1,
-                'account_id' => Account::where('code', '2100')->first()->id, // Accounts Payable
-                'date' => Carbon::now()->subDays(5),
-                'description' => 'Supplier payment',
-                'amount' => 1175.00,
-                'type' => BankTransactionTypeEnum::WITHDRAWAL,
-                'reference' => 'BILL-1',
-                'user_id' => 1,
-            ],
-            [
-                'bank_account_id' => 1,
-                'account_id' => Account::where('code', '6200')->first()->id, // Rent Expense
-                'date' => Carbon::now()->subDays(1),
-                'description' => 'Monthly rent',
-                'amount' => 15000.00,
-                'type' => BankTransactionTypeEnum::WITHDRAWAL,
-                'reference' => 'RENT-06',
-                'user_id' => 1,
-            ],
-        ];
-
-        foreach ($bankTransactions as $transactionData) {
-            BankTransaction::create($transactionData);
-        }
-
-        // Create bank reconciliation
-        $reconciliation = BankReconciliation::create([
-            'bank_account_id' => 1,
-            'statement_date' => Carbon::now()->subDays(1),
-            'statement_balance' => 34778.75,
-            'adjusted_balance' => 34778.75,
-            'is_completed' => true,
-            'notes' => 'June 2023 reconciliation',
-        ]);
-
-        // Mark transactions as reconciled
-        BankTransaction::where('bank_account_id', 1)
-            ->where('date', '<=', $reconciliation->statement_date)
-            ->update(['reconciliation_id' => $reconciliation->id]);
 
         // Create shifts
         $shifts = [
@@ -758,135 +510,9 @@ class DatabaseSeeder extends Seeder
         foreach ($setups as $setupData) {
             Setup::create($setupData);
         }
-
-        // Create journal entries for other transactions
-        // Create journal entries that properly reference actual transactions
-        $journalEntries = [
-            // Journal entry for Order #1
-            [
-                'entry_date' => $orders[0]['created_at'],
-                'reference_number' => 'ORDJ-001',
-                'memo' => 'Revenue from Order #1',
-                'user_id' => $orders[0]['user_id'],
-                'referenceable_type' => Order::class,
-                'referenceable_id' => 1,
-                'journal_items' => [
-                    [
-                        'account_id' => Account::where('code', '4000')->first()->id, // Sales Revenue
-                        'debit' => 0,
-                        'credit' => 50.00,
-                        'memo' => 'Revenue from sandwich sales'
-                    ],
-                    [
-                        'account_id' => Account::where('code', '1121')->first()->id, // Main Bank Account
-                        'debit' => 52.50,
-                        'credit' => 0,
-                        'memo' => 'Cash received'
-                    ],
-                    [
-                        'account_id' => Account::where('code', '2400')->first()->id, // Sales Tax Payable
-                        'debit' => 0,
-                        'credit' => 2.50,
-                        'memo' => 'Tax collected'
-                    ]
-                ]
-            ],
-
-            // Journal entry for Bill #1
-            [
-                'entry_date' => $bills[0]['date'],
-                'reference_number' => 'BILLJ-001',
-                'memo' => 'Inventory purchase from supplier',
-                'user_id' => $bills[0]['user_id'],
-                'referenceable_type' => Bill::class,
-                'referenceable_id' => 1,
-                'journal_items' => [
-                    [
-                        'account_id' => Account::where('code', '1300')->first()->id, // Inventory
-                        'debit' => 1175.00,
-                        'credit' => 0,
-                        'memo' => 'Food supplies received'
-                    ],
-                    [
-                        'account_id' => Account::where('code', '2100')->first()->id, // Accounts Payable
-                        'debit' => 0,
-                        'credit' => 1175.00,
-                        'memo' => 'Owed to supplier'
-                    ]
-                ]
-            ],
-
-            // Journal entry for Bank Transaction (deposit)
-            [
-                'entry_date' => $bankTransactions[0]['date'],
-                'reference_number' => 'BANKJ-001',
-                'memo' => 'Customer payment received',
-                'user_id' => $bankTransactions[0]['user_id'],
-                'referenceable_type' => BankTransaction::class,
-                'referenceable_id' => 1,
-                'journal_items' => [
-                    [
-                        'account_id' => Account::where('code', '1121')->first()->id, // Main Bank Account
-                        'debit' => 78.75,
-                        'credit' => 0,
-                        'memo' => 'Funds deposited'
-                    ],
-                    [
-                        'account_id' => Account::where('code', '1200')->first()->id, // Accounts Receivable
-                        'debit' => 0,
-                        'credit' => 78.75,
-                        'memo' => 'Customer payment applied'
-                    ]
-                ]
-            ],
-
-            // Journal entry for Inventory Transaction
-            [
-                'entry_date' => now(),
-                'reference_number' => 'INVJ-001',
-                'memo' => 'Initial inventory stock',
-                'user_id' => $inventoryTransactions[0]['user_id'],
-                'referenceable_type' => InventoryTransaction::class,
-                'referenceable_id' => 1,
-                'journal_items' => [
-                    [
-                        'account_id' => Account::where('code', '1300')->first()->id, // Inventory
-                        'debit' => 750.00, // 50kg × 15.00/kg
-                        'credit' => 0,
-                        'memo' => 'Chicken breast received'
-                    ],
-                    [
-                        'account_id' => Account::where('code', '1121')->first()->id, // Main Bank Account
-                        'debit' => 0,
-                        'credit' => 750.00,
-                        'memo' => 'Payment for inventory'
-                    ]
-                ]
-            ]
-        ];
-
-        foreach ($journalEntries as $entryData) {
-            $journalEntry = JournalEntry::create([
-                'entry_date' => $entryData['entry_date'],
-                'reference_number' => $entryData['reference_number'],
-                'memo' => $entryData['memo'],
-                'user_id' => $entryData['user_id'],
-                'referenceable_type' => $entryData['referenceable_type'],
-                'referenceable_id' => $entryData['referenceable_id'],
-            ]);
-
-            foreach ($entryData['journal_items'] as $itemData) {
-                JournalItem::create([
-                    'journal_entry_id' => $journalEntry->id,
-                    'account_id' => $itemData['account_id'],
-                    'debit' => $itemData['debit'],
-                    'credit' => $itemData['credit'],
-                    'memo' => $itemData['memo'],
-                    'referenceable_type' => $entryData['referenceable_type'],
-                    'referenceable_id' => $entryData['referenceable_id'],
-                ]);
-            }
-        }
+        Account::fixTree();
     }
+
+
 
 }

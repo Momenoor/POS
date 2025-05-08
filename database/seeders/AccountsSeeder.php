@@ -15,7 +15,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1000',
                 'name' => 'Current Assets',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'All current assets'
@@ -24,7 +24,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1100',
                 'name' => 'Cash and Cash Equivalents',
                 'type' => 'asset',
-                'parent_account_id' => null, // Will update after parent is created
+                'parent_id' => null, // Will update after parent is created
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Cash on hand and in bank'
@@ -33,7 +33,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1110',
                 'name' => 'Cash on Hand',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Physical cash in register'
@@ -42,7 +42,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1120',
                 'name' => 'Bank Accounts',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'All bank accounts'
@@ -51,7 +51,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1121',
                 'name' => 'Main Business Account',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Primary business checking account'
@@ -60,7 +60,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1122',
                 'name' => 'Savings Account',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Business savings account'
@@ -69,7 +69,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1200',
                 'name' => 'Accounts Receivable',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Amounts owed by customers'
@@ -78,7 +78,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1300',
                 'name' => 'Inventory',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Food and beverage inventory'
@@ -87,7 +87,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1400',
                 'name' => 'Prepaid Expenses',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Prepaid rent, insurance, etc.'
@@ -96,7 +96,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1500',
                 'name' => 'Fixed Assets',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Long-term assets'
@@ -105,7 +105,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1510',
                 'name' => 'Equipment',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Kitchen equipment, furniture'
@@ -114,7 +114,7 @@ class AccountsSeeder extends Seeder
                 'code' => '1520',
                 'name' => 'Accumulated Depreciation',
                 'type' => 'asset',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Accumulated depreciation on fixed assets'
@@ -125,7 +125,7 @@ class AccountsSeeder extends Seeder
                 'code' => '2000',
                 'name' => 'Current Liabilities',
                 'type' => 'liability',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Short-term obligations'
@@ -134,7 +134,7 @@ class AccountsSeeder extends Seeder
                 'code' => '2100',
                 'name' => 'Accounts Payable',
                 'type' => 'liability',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Amounts owed to suppliers'
@@ -143,7 +143,7 @@ class AccountsSeeder extends Seeder
                 'code' => '2200',
                 'name' => 'Accrued Expenses',
                 'type' => 'liability',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Accrued wages, utilities, etc.'
@@ -152,7 +152,7 @@ class AccountsSeeder extends Seeder
                 'code' => '2300',
                 'name' => 'Short-term Loans',
                 'type' => 'liability',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Loans due within one year'
@@ -161,7 +161,7 @@ class AccountsSeeder extends Seeder
                 'code' => '2400',
                 'name' => 'Sales Tax Payable',
                 'type' => 'liability',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Collected sales tax not yet remitted'
@@ -172,7 +172,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3000',
                 'name' => 'Owner\'s Equity',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Partners\' capital accounts'
@@ -181,7 +181,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3100',
                 'name' => 'Partner 1 Capital',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Capital account for Partner 1'
@@ -190,7 +190,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3200',
                 'name' => 'Partner 2 Capital',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Capital account for Partner 2'
@@ -199,7 +199,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3300',
                 'name' => 'Partner 3 Capital',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Capital account for Partner 3'
@@ -208,7 +208,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3400',
                 'name' => 'Partner 4 Capital',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Capital account for Partner 4'
@@ -217,7 +217,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3500',
                 'name' => 'Partner 5 Capital',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Capital account for Partner 5'
@@ -226,7 +226,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3600',
                 'name' => 'Retained Earnings',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Accumulated profits/losses'
@@ -235,7 +235,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3700',
                 'name' => 'Prior Year Losses',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Accumulated losses from previous years'
@@ -244,7 +244,7 @@ class AccountsSeeder extends Seeder
                 'code' => '3800',
                 'name' => 'Drawings',
                 'type' => 'equity',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Owner withdrawals'
@@ -255,7 +255,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4000',
                 'name' => 'Sales Revenue',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Income from food sales'
@@ -264,7 +264,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4100',
                 'name' => 'Sandwich Sales',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Revenue from sandwich sales'
@@ -273,7 +273,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4200',
                 'name' => 'Drink Sales',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Revenue from beverage sales'
@@ -282,7 +282,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4300',
                 'name' => 'Dessert Sales',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Revenue from dessert sales'
@@ -291,7 +291,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4400',
                 'name' => 'Delivery Fees',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Income from delivery charges'
@@ -300,7 +300,7 @@ class AccountsSeeder extends Seeder
                 'code' => '4500',
                 'name' => 'Other Income',
                 'type' => 'revenue',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Miscellaneous income'
@@ -311,7 +311,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5000',
                 'name' => 'Cost of Goods Sold',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Direct costs of products sold'
@@ -320,7 +320,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5100',
                 'name' => 'Food Ingredients',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Cost of sandwich ingredients'
@@ -329,7 +329,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5200',
                 'name' => 'Bread',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Cost of bread for sandwiches'
@@ -338,7 +338,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5300',
                 'name' => 'Beverage Costs',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Cost of drinks and water'
@@ -347,7 +347,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5400',
                 'name' => 'Dessert Costs',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Cost of dessert ingredients'
@@ -356,7 +356,7 @@ class AccountsSeeder extends Seeder
                 'code' => '5500',
                 'name' => 'Packaging Supplies',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Boxes, bags, wraps, etc.'
@@ -365,7 +365,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6000',
                 'name' => 'Operating Expenses',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Day-to-day business expenses'
@@ -374,7 +374,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6100',
                 'name' => 'Salaries and Wages',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Staff salaries and wages'
@@ -383,7 +383,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6200',
                 'name' => 'Rent Expense',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Shop rental costs'
@@ -392,7 +392,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6300',
                 'name' => 'Utilities',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Electricity, water, gas (Sewa)'
@@ -401,7 +401,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6400',
                 'name' => 'Delivery Bike Rent',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Cost for delivery transportation'
@@ -410,7 +410,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6500',
                 'name' => 'Staff Accommodation',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Housing costs for employees'
@@ -419,7 +419,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6600',
                 'name' => 'Mobile and Internet',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Communication expenses'
@@ -428,7 +428,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6700',
                 'name' => 'Marketing and Advertising',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Media and promotional costs'
@@ -437,7 +437,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6800',
                 'name' => 'Licenses and Permits',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Legal permits and business licenses'
@@ -446,7 +446,7 @@ class AccountsSeeder extends Seeder
                 'code' => '6900',
                 'name' => 'Visa and Immigration Costs',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Staff visa expenses'
@@ -455,7 +455,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7000',
                 'name' => 'General and Administrative',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => true,
                 'opening_balance' => 0,
                 'description' => 'Overhead expenses'
@@ -464,7 +464,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7100',
                 'name' => 'Office Supplies',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Paper, pens, etc.'
@@ -473,7 +473,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7200',
                 'name' => 'Professional Fees',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Accounting, legal fees'
@@ -482,7 +482,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7300',
                 'name' => 'Insurance',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Business insurance premiums'
@@ -491,7 +491,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7400',
                 'name' => 'Repairs and Maintenance',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Equipment and facility maintenance'
@@ -500,7 +500,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7500',
                 'name' => 'Depreciation Expense',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Periodic depreciation of assets'
@@ -509,7 +509,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7600',
                 'name' => 'Bank Charges',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Bank fees and service charges'
@@ -518,7 +518,7 @@ class AccountsSeeder extends Seeder
                 'code' => '7700',
                 'name' => 'Miscellaneous Expenses',
                 'type' => 'expense',
-                'parent_account_id' => null,
+                'parent_id' => null,
                 'is_system_account' => false,
                 'opening_balance' => 0,
                 'description' => 'Other uncategorized expenses'
@@ -599,7 +599,7 @@ class AccountsSeeder extends Seeder
         foreach ($parentChildRelationships as $childCode => $parentCode) {
             if (isset($createdAccounts[$childCode]) && isset($createdAccounts[$parentCode])) {
                 $createdAccounts[$childCode]->update([
-                    'parent_account_id' => $createdAccounts[$parentCode]->id
+                    'parent_id' => $createdAccounts[$parentCode]->id
                 ]);
             }
         }

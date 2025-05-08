@@ -4,13 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Exports\AccountExporter;
 use App\Filament\Resources\AccountResource\Pages;
-use App\Filament\Resources\AccountResource\RelationManagers;
 use App\Models\Account;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
 use Filament\Tables;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -29,19 +29,18 @@ class AccountResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->striped()
             //->query(Account::query()->whereNull('parent_account_id')->orderBy('code'))
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->searchable()
-                    ->listWithLineBreaks()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->formatStateUsing(fn($state, $record) => str_repeat('— ', $record->depth) . $state)
-                    ->searchable()
-                    ->listWithLineBreaks(),
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
-                    ->listWithLineBreaks()
                     ->color(fn(string $state): array => match ($state) {
                         'asset' => Color::Green,
                         'liability' => Color::Red,
@@ -50,16 +49,52 @@ class AccountResource extends Resource
                         'expense' => Color::Orange,
                     }),
                 Tables\Columns\IconColumn::make('is_system_account')
-                    ->boolean()
-                    ->listWithLineBreaks(),
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('opening_balance')
-                    ->money('AED')
-                    ->sortable()
-                    ->listWithLineBreaks(),
+                    ->currency()
+                    ->label('Opening Balance')
+                    ->sortable(),
+//                    ->formatStateUsing(callback: function ($state, Tables\Columns\TextColumn $component) {
+//
+//                        dd(app()->make('filamentCurrency')->parseAmount($state));
+//                        if ($state < 0) {
+//                            $state = $state * -1;
+//                            $state = app('filament-currency')->parseAmount($state);
+//                            $component->color(Color::Red);
+//                            return $state->format();
+//                        }
+//                        return $state;
+//                    }),
                 Tables\Columns\TextColumn::make('current_balance')
-                    ->money('AED')
-                    ->sortable()
-                    ->listWithLineBreaks(),
+                    ->currency()
+                    ->label('Current Balance')
+                    ->sortable(),
+//                Tables\Columns\TextColumn::make('debit_opening_balance')
+//                    ->money('AED')
+//                    ->label('Opening Balance')
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('credit_opening_balance')
+//                    ->money('AED')
+//                    ->label('Opening Balance')
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('debit_current_balance')
+//                    ->money('AED')
+//                    ->color(Color::Red)
+//                    ->label('Current Balance')
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('credit_current_balance')
+//                    ->money('AED')
+//                    ->color(Color::Green)
+//                    ->label('Current Balance')
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('debit_ending_balance')
+//                    ->money('AED')
+//                    ->label('Ending Balance')
+//                    ->sortable(),
+//                Tables\Columns\TextColumn::make('credit_ending_balance')
+//                    ->money('AED')
+//                    ->label('Ending Balance')
+//                    ->sortable(),
             ])
 //            ->groups([
 //                Tables\Grouping\Group::make('parent_account_id')
@@ -88,6 +123,15 @@ class AccountResource extends Resource
                         'revenue' => 'Revenue',
                         'expense' => 'Expense',
                     ]),
+                TernaryFilter::make('leaf_only')
+                    ->label('Leaf Accounts')
+                    ->placeholder('All')
+                    ->trueLabel('Only Leafs')
+                    ->queries(
+                        true: fn($query) => $query->whereDoesntHave('children'),
+                        false: fn($query) => $query, // or show only parents if you want
+                        blank: fn($query) => $query // no filter applied
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -116,14 +160,6 @@ class AccountResource extends Resource
             'create' => Pages\CreateAccount::route('/create'),
             'edit' => Pages\EditAccount::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withSum('journalItems as total_debit', 'debit')
-            ->withSum('journalItems as total_credit', 'credit')
-            ->with(['parent', 'parent.parent']);
     }
 
     /**
@@ -160,5 +196,10 @@ class AccountResource extends Resource
             Forms\Components\Textarea::make('description')
                 ->columnSpanFull(),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withDepth()->defaultOrder(); // Orders by lft (tree structure)
     }
 }

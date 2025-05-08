@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\JournalItemObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
+#[ObservedBy([JournalItemObserver::class])]
 class JournalItem extends Model implements AuditableContract
 {
     use Auditable, SoftDeletes;

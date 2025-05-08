@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('code', 20)->unique();
             $table->string('name', 100);
             $table->enum('type', ['asset', 'liability', 'equity', 'revenue', 'expense']);
-            $table->foreignId('parent_account_id')->nullable()->constrained('accounts');
+            $table->nestedSet();
             $table->boolean('is_system_account')->default(false);
             $table->decimal('current_balance', 15, 2)->default(0);
             $table->decimal('opening_balance', 15, 2)->default(0);
@@ -181,6 +181,18 @@ return new class extends Migration {
             $table->index(['name', 'phone']);
         });
 
+        Schema::create('bank_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('account_id')->constrained();
+            $table->string('bank_name', 100);
+            $table->string('account_number', 50);
+            $table->string('routing_number', 50)->nullable();
+            $table->decimal('current_balance', 12, 2)->default(0);
+            $table->boolean('is_primary')->default(false);
+            $table->timestamps();
+            $table->index(['account_number', 'bank_name']);
+        });
+
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(\App\Models\Account::class)->nullable()->constrained();
@@ -283,18 +295,6 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
             $table->index(['account_id', 'date']);
-        });
-
-        Schema::create('bank_accounts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('account_id')->constrained();
-            $table->string('bank_name', 100);
-            $table->string('account_number', 50);
-            $table->string('routing_number', 50)->nullable();
-            $table->decimal('current_balance', 12, 2)->default(0);
-            $table->boolean('is_primary')->default(false);
-            $table->timestamps();
-            $table->index(['account_number', 'bank_name']);
         });
 
         Schema::create('bank_reconciliations', function (Blueprint $table) {
