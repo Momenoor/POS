@@ -23,12 +23,16 @@ class PaymentRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('refernce_number')
             ->columns([
-                Tables\Columns\TextColumn::make('reference_number'),
-                Tables\Columns\TextColumn::make('amount')->money('AED'),
-                Tables\Columns\TextColumn::make('payment_method'),
-                Tables\Columns\TextColumn::make('payment_date')->date(),
+                Tables\Columns\TextColumn::make('reference_number')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('amount')
+                    ->currency()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('payment_date')->date()
+                    ->searchable(),
             ])
             ->filters([
                 //

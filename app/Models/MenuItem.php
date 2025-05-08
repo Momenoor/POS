@@ -58,4 +58,11 @@ class MenuItem extends Model implements AuditableContract
     {
         return $this->belongsTo(Account::class);
     }
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'menu_category_item')
+            ->withPivot('category_id', 'price', 'cost', 'is_available', 'tax_rate_id')
+            ->withTimestamps();
+    }
 }

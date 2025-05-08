@@ -2,10 +2,17 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\MenuCategoryResource\RelationManagers\MenuItemsRelationManager;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Filament\Resources\MenuItemResource\RelationManagers;
 use App\Models\MenuItem;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -14,38 +21,14 @@ use Filament\Tables\Table;
 class MenuItemResource extends Resource
 {
     protected static ?string $model = MenuItem::class;
-    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-4';
     protected static ?string $navigationGroup = 'Menu Management';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('description')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('price')
-                    ->required()
-                    ->numeric()
-                    ->prefix('AED'),
-                Forms\Components\TextInput::make('cost')
-                    ->numeric()
-                    ->prefix('AED'),
-                Forms\Components\Toggle::make('is_taxable')
-                    ->required(),
-                Forms\Components\Toggle::make('is_available')
-                    ->required(),
-                Forms\Components\FileUpload::make('image')
-                    ->directory('menu-items')
-                    ->image(),
-                Forms\Components\Select::make('tax_rate_id')
-                    ->relationship('taxRate', 'name'),
-            ]);
+            ->schema(self::getFormSchema());
     }
 
     public static function table(Table $table): Table
@@ -91,6 +74,73 @@ class MenuItemResource extends Resource
             'index' => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
             'edit' => Pages\EditMenuItem::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getFormSchema(): array
+    {
+        return [
+
+            Section::make('Item Details')
+                ->schema([
+                    FileUpload::make('image')
+                        ->directory('menu-items')
+                        ->circleCropper()
+                        ->image()
+                        ->columnSpanFull(),
+
+                    TextInput::make('name')
+                        ->required()
+                        ->maxLength(100),
+
+                    Textarea::make('description')
+                        ->maxLength(255),
+
+                    Select::make('category_id')
+                        ->relationship('category', 'name')
+                        ->required()
+                        ->default(function ($livewire) {
+                            ($livewire instanceof MenuItemsRelationManager)
+                                ? $livewire->getOwnerRecord()->id
+                                : null;
+                        })
+                        ->hidden(fn($livewire) => $livewire instanceof MenuItemsRelationManager),
+                ])
+                ->columns(2),
+
+            Section::make('Pricing')
+                ->schema([
+                    TextInput::make('price')
+                        ->required()
+                        ->numeric()
+                        ->prefix('AED'),
+
+                    TextInput::make('cost')
+                        ->numeric()
+                        ->prefix('AED'),
+                ])
+                ->columns(2),
+
+            Section::make('Tax & Availability')
+                ->schema([
+                    Toggle::make('is_taxable')
+                        ->required()
+                        ->lazy(),
+
+
+                    Toggle::make('is_available')
+                        ->required()
+                        ->default(true),
+
+                    Select::make('tax_rate_id')
+                        ->relationship('taxRate', 'name')
+                        ->reactive()
+                        ->hidden(fn(Forms\Get $get): bool => !$get('is_taxable')),
+                ])
+                ->columns(2),
         ];
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\MenuCategoryResource\RelationManagers;
 
-use Filament\Forms;
+use App\Filament\Resources\MenuItemResource;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 
 class MenuItemsRelationManager extends RelationManager
 {
@@ -17,11 +17,7 @@ class MenuItemsRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+            ->schema(MenuItemResource::getFormSchema());
     }
 
     public function table(Table $table): Table
@@ -29,7 +25,15 @@ class MenuItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('price')
+                    ->color(Color::Green)
+                    ->money(),
+                Tables\Columns\TextColumn::make('cost')
+                    ->color(Color::Red)
+                    ->money(),
             ])
             ->filters([
                 //

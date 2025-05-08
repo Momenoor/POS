@@ -18,8 +18,9 @@ use Filament\Tables\Table;
 class MenuCategoryResource extends Resource
 {
     protected static ?string $model = MenuCategory::class;
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3';
     protected static ?string $navigationGroup = 'Menu Management';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -76,24 +77,26 @@ class MenuCategoryResource extends Resource
     public static function getFormSchema(): array
     {
         return [
-            Forms\Components\Select::make('restaurant_id')
-                ->relationship('restaurant', 'name')
-                ->required(fn($livewire): bool => !$livewire instanceof MenuCategoriesRelationManager)
-                ->hidden(fn($livewire): bool => $livewire instanceof MenuCategoriesRelationManager)
-                ->default(fn($livewire) => $livewire instanceof MenuCategoriesRelationManager
-                    ? $livewire->ownerRecord?->id
-                    : null
-                ),
+//            Forms\Components\Select::make('restaurant_id')
+//                ->relationship('restaurant', 'name')
+//                ->required(fn($livewire): bool => !$livewire instanceof MenuCategoriesRelationManager)
+//                ->hidden(fn($livewire): bool => $livewire instanceof MenuCategoriesRelationManager)
+//                ->default(fn($livewire) => $livewire instanceof MenuCategoriesRelationManager
+//                    ? $livewire->ownerRecord?->id
+//                    : null
+//                ),
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->maxLength(100),
-            Forms\Components\TextInput::make('description')
+            Forms\Components\Textarea::make('description')
                 ->maxLength(255),
             Forms\Components\TextInput::make('sort_order')
                 ->numeric()
                 ->default(0),
             Forms\Components\Toggle::make('is_active')
-                ->required(),
+                ->required()
+                ->inline(false)
+                ->default(true),
         ];
     }
 }

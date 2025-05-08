@@ -90,7 +90,6 @@ return new class extends Migration {
         // 2. Restaurant Operations Tables
         Schema::create('menu_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('restaurant_id')->nullable()->constrained();
             $table->foreignIdFor(\App\Models\Menu::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('name', 100);
             $table->string('description', 255)->nullable();
@@ -117,6 +116,21 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
             $table->index(['name', 'price', 'is_available']);
+        });
+
+        Schema::create('menu_category_item', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(\App\Models\Menu::class, 'menu_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\MenuCategory::class, 'category_id')->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\MenuItem::class, 'item_id')->constrained()->cascadeOnDelete();
+            $table->decimal('price', 10, 2);
+            $table->decimal('cost', 10, 2);
+            $table->boolean('is_available')->default(true);
+            $table->boolean('is_taxable')->default(true);
+            $table->foreignIdFor(\App\Models\TaxRate::class, 'tax_rate_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->timestamps();
+            $table->unique(['menu_id', 'category_id', 'item_id']);
+            $table->index(['menu_id', 'category_id', 'item_id']);
         });
 
         Schema::create('suppliers', function (Blueprint $table) {
@@ -228,8 +242,8 @@ return new class extends Migration {
 
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('menu_item_id')->constrained();
+            $table->foreignIdFor(\App\Models\Order::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\MenuCategoryItem::class, 'menu_item_id')->constrained()->cascadeOnDelete();
             $table->decimal('unit_price', 8, 2);
             $table->integer('quantity')->default(1);
             $table->decimal('subtotal', 10, 2);

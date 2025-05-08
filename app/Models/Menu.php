@@ -12,4 +12,11 @@ class Menu extends Model
     {
         return $this->hasMany(MenuCategory::class);
     }
+
+    public function items()
+    {
+        return $this->belongsToMany(MenuItem::class, 'menu_category_item', 'menu_id', 'item_id')
+            ->withPivot('category_id', 'price', 'cost', 'is_available', 'tax_rate_id')
+            ->withTimestamps();
+    }
 }
