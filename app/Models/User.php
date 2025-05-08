@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Audit;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail, AuditableContract
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, LogsActivity;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Auditable;
 
     protected $fillable = [
         'name',
@@ -36,13 +38,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     /**
      * @return LogOptions
      */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'email'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
 
     public function staff(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
