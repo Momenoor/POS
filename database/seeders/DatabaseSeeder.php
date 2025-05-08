@@ -4,8 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\{
-    Account,
+use App\Models\{Account,
     TaxRate,
     Restaurant,
     Staff,
@@ -27,7 +26,8 @@ use App\Models\{
     BankReconciliation,
     BankTransaction,
     Shift,
-    Setup
+    Setup,
+    User
 };
 use App\Enums\{
     BankTransactionTypeEnum,
@@ -46,6 +46,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AccountsSeeder::class,
+        ]);
+        User::create([
+            'name' => 'Momen Noor',
+            'email' => 'momen.noor@gmail.com',
+            'password' => Hash::make('moLA@1324'),
+            'email_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 
