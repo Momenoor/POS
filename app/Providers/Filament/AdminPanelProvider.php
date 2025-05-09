@@ -34,6 +34,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Al-Haram Al-Rabie')
+            ->brandLogo(url('storage/restaurant-logos/01JTPZSAA5G2XXZP4TPFFQBX72.png'))
+            ->brandLogoHeight('3rem')
             ->colors([
                 'primary' => Color::Blue,
             ])
