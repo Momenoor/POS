@@ -90,7 +90,6 @@ return new class extends Migration {
         // 2. Restaurant Operations Tables
         Schema::create('menu_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Menu::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('name', 100);
             $table->string('description', 255)->nullable();
             $table->integer('sort_order')->default(0);
@@ -123,11 +122,11 @@ return new class extends Migration {
             $table->foreignIdFor(\App\Models\Menu::class, 'menu_id')->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\MenuCategory::class, 'category_id')->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\App\Models\MenuItem::class, 'item_id')->constrained()->cascadeOnDelete();
-            $table->decimal('price', 10, 2);
-            $table->decimal('cost', 10, 2);
-            $table->boolean('is_available')->default(true);
-            $table->boolean('is_taxable')->default(true);
-            $table->foreignIdFor(\App\Models\TaxRate::class, 'tax_rate_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->decimal('menu_price', 10, 2);
+            $table->decimal('menu_cost', 10, 2);
+            $table->boolean('menu_is_available')->default(true);
+            $table->boolean('menu_is_taxable')->default(true);
+            $table->foreignIdFor(\App\Models\TaxRate::class, 'menu_tax_rate_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->unique(['menu_id', 'category_id', 'item_id']);
             $table->index(['menu_id', 'category_id', 'item_id']);

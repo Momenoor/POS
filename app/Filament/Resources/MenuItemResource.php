@@ -83,7 +83,6 @@ class MenuItemResource extends Resource
     public static function getFormSchema(): array
     {
         return [
-
             Section::make('Item Details')
                 ->schema([
                     FileUpload::make('image')

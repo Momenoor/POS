@@ -11,18 +11,18 @@ class MenuCategoryItem extends Pivot
         'menu_id',
         'category_id',
         'item_id',
-        'price',
-        'cost',
-        'is_available',
-        'is_taxable',
-        'tax_rate_id',
+        'menu_price',
+        'menu_cost',
+        'menu_is_available',
+        'menu_is_taxable',
+        'menu_tax_rate_id',
     ];
 
     protected $casts = [
-        'is_available' => 'boolean',
-        'is_taxable' => 'boolean',
-        'price' => 'decimal:2',
-        'cost' => 'decimal:2',
+        'menu_is_available' => 'boolean',
+        'menu_is_taxable' => 'boolean',
+        'menu_price' => 'decimal:2',
+        'menu_cost' => 'decimal:2',
     ];
 
     public function menu(): BelongsTo

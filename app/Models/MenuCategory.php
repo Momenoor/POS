@@ -13,7 +13,6 @@ class MenuCategory extends Model implements AuditableContract
     use HasFactory, Auditable;
 
     protected $fillable = [
-        'menu_id',
         'restaurant_id',
         'name',
         'account_id',
@@ -53,7 +52,7 @@ class MenuCategory extends Model implements AuditableContract
     public function items()
     {
         return $this->belongsToMany(MenuItem::class, 'menu_category_item')
-            ->withPivot('menu_id', 'price', 'cost', 'is_available', 'tax_rate_id')
+            ->withPivot('menu_id', 'menu_price', 'menu_cost', 'menu_is_available', 'menu_tax_rate_id')
             ->withTimestamps();
     }
 }

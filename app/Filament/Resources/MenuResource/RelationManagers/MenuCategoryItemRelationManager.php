@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MenuCategoryItemRelationManager extends RelationManager
 {
-    protected static string $relationship = 'items'; // This is the method in Menu.php
+    protected static string $relationship = 'categoryItems'; // This is the method in Menu.php
 
     protected static ?string $title = 'Menu Items';
 
@@ -31,22 +31,22 @@ class MenuCategoryItemRelationManager extends RelationManager
                 ->preload()
                 ->required(),
 
-            Forms\Components\TextInput::make('price')
+            Forms\Components\TextInput::make('menu_price')
                 ->numeric()
                 ->prefix('AED')
                 ->required(),
 
-            Forms\Components\TextInput::make('cost')
+            Forms\Components\TextInput::make('menu_cost')
                 ->numeric()
                 ->prefix('AED'),
 
-            Forms\Components\Toggle::make('is_available')
+            Forms\Components\Toggle::make('menu_is_available')
                 ->required(),
 
-            Forms\Components\Toggle::make('is_taxable')
+            Forms\Components\Toggle::make('menu_is_taxable')
                 ->required(),
 
-            Forms\Components\Select::make('tax_rate_id')
+            Forms\Components\Select::make('menu_tax_rate_id')
                 ->relationship('taxRate', 'name')
                 ->hidden(fn(Forms\Get $get) => !$get('is_taxable')),
         ]);
@@ -57,24 +57,15 @@ class MenuCategoryItemRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('category.name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('item.name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('price')->money('AED'),
-                Tables\Columns\TextColumn::make('cost')->money('AED'),
-                Tables\Columns\IconColumn::make('is_available')->boolean(),
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('menu_price')->money('AED'),
+                Tables\Columns\TextColumn::make('menu_cost')->money('AED'),
+                Tables\Columns\IconColumn::make('menu_is_available')->label('Item Is Available')->boolean(),
+                Tables\Columns\IconColumn::make('menu_is_taxable')->label('Item Is Taxable')->boolean(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category_id')
                     ->relationship('category', 'name'),
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
