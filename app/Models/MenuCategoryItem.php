@@ -42,6 +42,6 @@ class MenuCategoryItem extends Pivot
 
     public function taxRate(): BelongsTo
     {
-        return $this->belongsTo(TaxRate::class);
+        return $this->belongsTo(TaxRate::class, 'menu_tax_rate_id');
     }
 }

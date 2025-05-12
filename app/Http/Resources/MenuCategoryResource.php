@@ -15,13 +15,12 @@ class MenuCategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'restaurant_id' => $this->resturant_id,
-            'name' => $this->name,
-            'account_id' => $this->account_id,
+            'id' => $this->category_id,
+            'menu_id' => $this->menu_id,
+            'name' => $this->category->name,
             'description' => $this->description,
-            'sort_order' => $this->sort_order,
-            'is_active' => $this->is_active,
-            'items' => MenuItemResource::collection($this->whenLoaded('menuItems')),
+            'sort_order' => $this->category->sort_order??0,
+            'is_active' => $this->category->is_active,
         ];
     }
 }

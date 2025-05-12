@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuCategoryResource;
 use App\Models\MenuCategory;
+use App\Models\MenuCategoryItem;
 use Illuminate\Http\Request;
 
 class MenuCategoryController extends Controller
@@ -11,9 +13,19 @@ class MenuCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return MenuCategoryResource::collection(MenuCategory::with('menuItems')->get());
+        $query = MenuCategoryItem::query();
+        if ($request->has('menu_id')) {
+            $query = $query->where('menu_id', $request->get('menu_id'));
+        }
+        if ($request->has('is_active')) {
+            $query = $query->whereHas('category', function ($q) use ($request) {
+                $q->where('is_active', $request->boolean('is_active'));
+                $q->orderBy('sort_order', 'asc');
+            });
+        }
+        return MenuCategoryResource::collection($query->get()->unique('category_id'));
     }
 
     /**

@@ -1,12 +1,22 @@
 <?php
 
-use App\Http\Controllers\MenuCategoryController;
-use App\Http\Controllers\MenuItemController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ {
+    MenuCategoryController,
+    MenuItemController,
+    UserController,
+    MenuController,
+    OrderController,
+};
+
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('menu-categories', MenuCategoryController::class);
-Route::apiResource('menu-items', MenuItemController::class);
-Route::apiResource('users', UserController::class);
-Route::apiResource('menus', \App\Http\Controllers\MenuController::class);
-Route::apiResource('orders', \App\Http\Controllers\OrderController::class);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::apiResource('categories', MenuCategoryController::class);
+    Route::apiResource('items', MenuItemController::class);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('menus', MenuController::class);
+    Route::apiResource('orders', OrderController::class);
+});

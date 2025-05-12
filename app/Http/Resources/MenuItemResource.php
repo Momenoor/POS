@@ -15,19 +15,18 @@ class MenuItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $image = ($this->item->image) ? url('storage/' . $this->item->image) : null;
         return [
-            'id'=>$this->id,
+            'id' => $this->id,
             'category_id' => $this->category_id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'price' => $this->price,
-            'cost' => $this->cost,
-            'account_id' => $this->account_id,
-            'is_taxable' => $this->is_taxable,
-            'is_available' => $this->is_available,
-            'image' => $this->image,
-            'options' => $this->options,
-            'tax_rate_id' => $this->tax_rate_id
+            'menu_id' => $this->menu_id,
+            'name' => $this->item->name,
+            'description' => $this->item->description,
+            'price' => $this->menu_price,
+            'is_available' => $this->menu_is_available,
+            'image' => $image,
+            'options' => $this->item->options,
+            'tax_rate' => $this->taxRate->rate??0,
         ];
     }
 }
